@@ -1,78 +1,71 @@
 const router = require('express').Router();
-const { Post, Comment } = require('../models');
-// TODO: Import the custom middleware
-const withAuth = require('../utils/auth');
+const { Post, User, Comment } = require('../models');
 
-// GET all formatedPostData for homepage
-router.get('/', async (req, res) => {
-  try {
-    const dbPostData = await Post.findAll({
-      include: [
-        {
-          model: Comment,
-    
-        },
-      ],
-    });
-
-    const formatedPostData = dbPostData.map((Post) =>
-      Post.get({ plain: true })
-    );
-
-    res.render('homepage', {
-      formatedPostData,
-      loggedIn: req.session.loggedIn,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
-});
-
-// GET one Post
-// TODO: Replace the logic below with the custom middleware
-router.get('/Post/:id', withAuth, async (req, res) => {
-  // If the user is not logged in, redirect the user to the login page
-  if (!req.session.loggedIn) {
-    res.redirect('/login');
-  } else {
-    // If the user is logged in, allow them to view the Post
-    try {
-      const dbPostData = await Post.findByPk(req.params.id, {
-        include: [
-          {
-            model: Comment,
-          },
-        ],
+router.get('/', (req, res) => {
+  Post.findAll({
+    attributes: ['id', 'title', 'content', 'created_at', 'updated_at'],
+    order: [['created_at', 'DESC']],
+    include: [
+      {
+        model: User,
+        attributes: ['username'],
+      },
+      
+    ],
+  })
+    .then(dbData => {
+      const posts = dbData.map(item => item.get({ plain: true }));
+      res.render('homepage', {
+        posts,
+        loggedIn: req.session.loggedIn,
       });
-      const Post = dbPostData.get({ plain: true });
-      res.render('Post', { Post, loggedIn: req.session.loggedIn });
-    } catch (err) {
+
+      // res.json(dbData);
+    })
+    .catch(err => {
       console.log(err);
       res.status(500).json(err);
-    }
-  }
+    });
 });
 
-// GET one Comment
-// TODO: Replace the logic below with the custom middleware
-router.get('/Comment/:id', async (req, res) => {
-  // If the user is not logged in, redirect the user to the login page
-  if (!req.session.loggedIn) {
-    res.redirect('/login');
-  } else {
-    // If the user is logged in, allow them to view the Comment
-    try {
-      const dbCommentData = await Comment.findByPk(req.params.id);
-
-      const Comment = dbCommentData.get({ plain: true });
-
-      res.render('Comment', { Comment, loggedIn: req.session.loggedIn });
-    } catch (err) {
+router.get('/posts/:id', (req, res) => {
+  Post.findOne({
+    where: {
+      id: req.params.id,
+    },
+    attributes: ['id', 'title', 'content', 'created_at', 'updated_at'],
+    order: [['created_at', 'DESC']],
+    include: [
+      {
+        model: User,
+        attributes: ['username'],
+      },
+      //comment model goes here 
+      {
+        model: Comment,
+        attributes: ['id', 'comment_text', 'user_id', 'created_at'],
+        include: {
+          model: User,
+          attributes: ['username'],
+        },
+      },
+    ],
+  })
+    .then(dbData => {
+      if (!dbData) {
+        res.status(404).json({ message: 'No post found with this id' });
+        return;
+      }
+      const post = dbData.get({ plain: true });
+      res.render('single-post', {
+        post,
+        loggedIn: req.session.loggedIn,
+      });
+    })
+    .catch(err => {
       console.log(err);
       res.status(500).json(err);
-    }
-  }
+    });
 });
 
 router.get('/login', (req, res) => {
@@ -80,8 +73,15 @@ router.get('/login', (req, res) => {
     res.redirect('/');
     return;
   }
-
   res.render('login');
+});
+
+router.get('/signup', (req, res) => {
+  if (req.session.loggedIn) {
+    res.redirect('/');
+    return;
+  }
+  res.render('signup');
 });
 
 module.exports = router;
