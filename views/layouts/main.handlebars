@@ -2,36 +2,47 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>tech-blog</title>
-  <link rel="stylesheet" type="text/css" href="/css/jass.css">
-  <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Blog</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 
 <body>
-  <header>
-    <h1>Welcome to tech-blog</h1>
-  </header>
-  <nav>
-    <a href="/">Home</a>
+    <header>
+        <nav>
+            <ul>
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li>
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+
+                {{#if loggedIn}}
+                <li id="logout">
+                    <a href="javascript:;">Logout</a>
+                </li>
+                {{else}}
+                <li>
+                    <a href="/login">login</a>
+                </li>
+                {{/if}}
+
+            </ul>
+        </nav>
+        <h1>The Tech Blog</h1>
+    </header>
+    <main>
+        {{{body}}}
+    </main>
+    <footer>
+        {{!-- Thanks for visiting --}}
+    </footer>
     {{#if loggedIn}}
-    <button id="logout" class="btn-no-style">Logout</button>
-    {{else}}
-    <a href="/login">Login</a>
+    <script src="/javascripts/logout.js"></script>
     {{/if}}
-  </nav>
-  <main>
-    <aside>
-      <h2>Enjoy the galleries!</h2>
-    </aside>
-    <div class="gallery">
-      {{{body}}}
-    </div>
-  </main>
-  {{#if loggedIn}}
-  <script src="/js/logout.js"></script>
-  {{/if}}
 </body>
 
 </html>
