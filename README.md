@@ -25,6 +25,10 @@
 ## Demo Images
 ![git-techblog](https://user-images.githubusercontent.com/97642221/176287542-6673ed94-f0cf-4ad2-8c04-1934296b4d4a.JPG)
 
-![git-techblog2](https://user-images.githubusercontent.com/97642221/176287554-ed6c0cc8-b2a9-44d9-9905-5fb248132584.JPG)
+
+![git-techblog3](https://user-images.githubusercontent.com/97642221/176309324-6d275003-b2d5-4891-8f03-568901ae0943.JPG)
+
 
 ## Link to app 
+https://brians-tech-blog-demo.herokuapp.com/dashboard
+
